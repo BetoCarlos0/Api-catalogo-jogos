@@ -16,39 +16,118 @@ namespace ApiCatalogoJogos.Repositories
             sqlConnection = new SqlConnection(configuration.GetConnectionString("Default"));
         }
 
-        public Task Atualizar(Jogo jogo)
+        public async Task Atualizar(Jogo jogos)
         {
-            throw new NotImplementedException();
+            var comando = $"update Jogos set Nome = '{jogos.Nome}', Produtora = '{jogos.Produtora}', Preco = {jogos.Preco.ToString().Replace(",", ".")} where Id = '{jogos.Id}'";
+
+            await sqlConnection.OpenAsync();
+            SqlCommand sqlCommand = new SqlCommand(comando, sqlConnection);
+            sqlCommand.ExecuteNonQuery();
+            await sqlConnection.CloseAsync();
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            sqlConnection?.Close();
+            sqlConnection?.Dispose();
         }
 
-        public Task Inserir(Jogo jogo)
+        public async Task Inserir(Jogo jogos)
         {
-            throw new NotImplementedException();
+            var comando = $"insert Jogos (Id, Nome, Produtora, Preco) values ('{jogos.Id}', '{jogos.Nome}', '{jogos.Produtora}', {jogos.Preco.ToString().Replace(",", ".")})";
+
+            await sqlConnection.OpenAsync();
+            SqlCommand sqlCommand = new SqlCommand(comando, sqlConnection);
+            sqlCommand.ExecuteNonQuery();
+            await sqlConnection.CloseAsync();
         }
 
-        public Task<List<Jogo>> Obter(int pagina, int quantidade)
+        public async Task<List<Jogo>> Obter(int pagina, int quantidade)
         {
-            throw new NotImplementedException();
+            var jogos = new List<Jogo>();
+
+            var comando = $"select * from Jogos order by id offset {((pagina - 1) * quantidade)} rows fetch next {quantidade} rows only";
+
+            await sqlConnection.OpenAsync();
+            SqlCommand sqlCommand = new SqlCommand(comando, sqlConnection);
+            SqlDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync();
+
+            while (sqlDataReader.Read())
+            {
+                jogos.Add(new Jogo
+                {
+                    Id = (Guid)sqlDataReader["Id"],
+                    Nome = (string)sqlDataReader["Nome"],
+                    Produtora = (string)sqlDataReader["Produtora"],
+                    Preco = (double)sqlDataReader["Preco"]
+                });
+            }
+
+            await sqlConnection.CloseAsync();
+
+            return jogos;
         }
 
-        public Task<Jogo> Obter(Guid id)
+        public async Task<Jogo> Obter(Guid id)
         {
-            throw new NotImplementedException();
+            Jogo jogo = null;
+
+            var comando = $"select * from Jogos where Id = '{id}'";
+
+            await sqlConnection.OpenAsync();
+            SqlCommand sqlCommand = new SqlCommand(comando, sqlConnection);
+            SqlDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync();
+
+            while (sqlDataReader.Read())
+            {
+                jogo = new Jogo
+                {
+                    Id = (Guid)sqlDataReader["Id"],
+                    Nome = (string)sqlDataReader["Nome"],
+                    Produtora = (string)sqlDataReader["Produtora"],
+                    Preco = (double)sqlDataReader["Preco"]
+                };
+            }
+
+            await sqlConnection.CloseAsync();
+
+            return jogo;
         }
 
-        public Task<List<Jogo>> Obter(string nome, string produtora)
+        public async Task<List<Jogo>> Obter(string nome, string produtora)
         {
-            throw new NotImplementedException();
+            var jogos = new List<Jogo>();
+
+            var comando = $"select * from Jogos where Nome = '{nome}' and Produtora = '{produtora}'";
+
+            await sqlConnection.OpenAsync();
+            SqlCommand sqlCommand = new SqlCommand(comando, sqlConnection);
+            SqlDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync();
+
+            while (sqlDataReader.Read())
+            {
+                jogos.Add(new Jogo
+                {
+                    Id = (Guid)sqlDataReader["Id"],
+                    Nome = (string)sqlDataReader["Nome"],
+                    Produtora = (string)sqlDataReader["Produtora"],
+                    Preco = (double)sqlDataReader["Preco"]
+                });
+            }
+
+            await sqlConnection.CloseAsync();
+
+            return jogos;
         }
 
-        public Task Remover(Guid id)
+        public async Task Remover(Guid id)
         {
-            throw new NotImplementedException();
+            var comando = $"delete from Jogos where Id = '{id}'";
+
+            await sqlConnection.OpenAsync();
+            SqlCommand sqlCommand = new SqlCommand(comando, sqlConnection);
+            sqlCommand.ExecuteNonQuery();
+            await sqlConnection.CloseAsync();
         }
     }
 }

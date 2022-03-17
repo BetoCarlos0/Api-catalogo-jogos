@@ -48,18 +48,19 @@ namespace ApiCatalogoJogos.Services
             _jogoRepository?.Dispose();
         }
 
-        public async Task<JogoViewModel> Inserir(JogoInputModel jogoInputModel)
+        public async Task<JogoViewModel> Inserir(JogoInputModel jogo)
         {
-            var entidadeJogo = await _jogoRepository.Obter(jogoInputModel.Nome, jogoInputModel.Produtora);
+            var entidadeJogo = await _jogoRepository.Obter(jogo.Nome, jogo.Produtora);
 
-            if (entidadeJogo.Count() > 0) throw new JogoJaCadastradoException();
+            if (entidadeJogo.Count > 0)
+                throw new JogoJaCadastradoException();
 
             var jogoInsert = new Jogo
             {
                 Id = Guid.NewGuid(),
-                Nome = jogoInputModel.Nome,
-                Produtora = jogoInputModel.Produtora,
-                Preco = jogoInputModel.Preco
+                Nome = jogo.Nome,
+                Produtora = jogo.Produtora,
+                Preco = jogo.Preco
             };
 
             await _jogoRepository.Inserir(jogoInsert);
@@ -67,9 +68,9 @@ namespace ApiCatalogoJogos.Services
             return new JogoViewModel
             {
                 Id = jogoInsert.Id,
-                Nome = jogoInputModel.Nome,
-                Produtora = jogoInputModel.Produtora,
-                Preco = jogoInputModel.Preco
+                Nome = jogo.Nome,
+                Produtora = jogo.Produtora,
+                Preco = jogo.Preco
             };
         }
 

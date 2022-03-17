@@ -23,6 +23,16 @@ namespace ApiCatalogoJogos.Controllers.V1
             _jogoService = jogoService;
         }
 
+        /// <summary>
+        /// Buscar todos os jogos de forma paginada
+        /// </summary>
+        /// <remarks>
+        /// Não é possível retornar os jogos sem paginação
+        /// </remarks>
+        /// <param name="pagina">Indica qual página está sendo consultada. Mínimo 1</param>
+        /// <param name="quantidade">Indica a quantidade de reistros por página. Mínimo 1 e máximo 50</param>
+        /// <response code="200">Retorna a lista de jogos</response>
+        /// <response code="204">Caso não haja jogos</response>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<JogoViewModel>>> Obter([FromQuery, Range(1, int.MaxValue)] int pagina = 1,
                                                                         [FromQuery, Range(1, 50)] int quantidade = 5)
@@ -33,6 +43,13 @@ namespace ApiCatalogoJogos.Controllers.V1
 
             return Ok(jogos);
         }
+
+        /// <summary>
+        /// Buscar um jogo pelo seu Id
+        /// </summary>
+        /// <param name="idJogo">Id do jogo buscado</param>
+        /// <response code="200">Retorna o jogo filtrado</response>
+        /// <response code="204">Caso não haja jogo com este id</response>
         [HttpGet("{idJogo:guid}")]
         public async Task<ActionResult<JogoViewModel>> Obter([FromRoute] Guid idJogo)
         {
@@ -49,11 +66,11 @@ namespace ApiCatalogoJogos.Controllers.V1
             try
             {
                 var jogo = await _jogoService.Inserir(jogoInputModel);
+
                 return Ok(jogo);
             }
             catch (JogoJaCadastradoException ex)
             {
-
                 return UnprocessableEntity("Já existe um jogo com este nome para esta produtora");
             }
         }
@@ -83,7 +100,6 @@ namespace ApiCatalogoJogos.Controllers.V1
             }
             catch (JogoJaCadastradoException ex)
             {
-
                 return UnprocessableEntity("Não existe este jogo");
             }
         }
@@ -101,7 +117,6 @@ namespace ApiCatalogoJogos.Controllers.V1
 
                 return UnprocessableEntity("Não existe este jogo");
             }
-            return Ok();
         }
     }
 }
