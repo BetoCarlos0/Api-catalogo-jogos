@@ -43,7 +43,7 @@ namespace ApiCatalogoJogos.Repositories
 
         public Task<Jogo> Obter(Guid id)
         {
-            if (!jogos.ContainsKey(id)) return null;
+            if (!jogos.ContainsKey(id)) return Task.FromResult<Jogo>(null);
 
             return Task.FromResult(jogos[id]);
         }
